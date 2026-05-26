@@ -1,0 +1,61 @@
+第二章 基因表达调控
+
+2.1 DNA复制
+
+DNA复制（DNA replication）是半保留复制（semiconservative replication）。复制起始于复制原点（origin of replication, ori），在原核生物中通常只有一个ori，而真核生物有多个。
+
+参与DNA复制的关键酶和蛋白：
+- DNA聚合酶（DNA polymerase）：原核生物中主要是Pol III（主要复制酶）和Pol I（去除RNA引物并填补缺口）；真核生物中主要是Pol α（引发酶活性）、Pol δ和Pol ε
+- 解旋酶（helicase）：解开双链DNA
+- 拓扑异构酶（topoisomerase）：消除超螺旋张力
+- SSB蛋白（single-strand binding protein）：稳定单链DNA
+- 引发酶（primase）：合成RNA引物
+- DNA连接酶（DNA ligase）：连接Okazaki片段
+
+前导链（leading strand）连续合成，滞后链（lagging strand）以冈崎片段（Okazaki fragment）形式不连续合成。
+
+2.2 转录
+
+转录（transcription）是以DNA为模板合成RNA的过程。原核生物只有一种RNA聚合酶（RNA polymerase），由核心酶（α₂ββ'ω）和σ因子组成全酶。σ因子负责识别启动子（promoter）的-10区（Pribnow box, TATAAT）和-35区。
+
+真核生物有三种RNA聚合酶：
+- Pol I：转录rRNA前体（45S rRNA）
+- Pol II：转录mRNA前体和大多数snRNA
+- Pol III：转录tRNA、5S rRNA和一些小RNA
+
+真核生物Pol II的转录起始需要通用转录因子（general transcription factor, GTF）的参与，包括TFIIA、TFIIB、TFIID（含TBP，TATA-binding protein）、TFIIE、TFIIF和TFIIH。
+
+2.3 RNA加工
+
+真核生物mRNA前体（pre-mRNA）的加工包括：
+1. 5'端加帽（5' capping）：添加7-甲基鸟苷（m⁷G）帽结构
+2. 3'端加尾（3' polyadenylation）：添加poly(A)尾巴
+3. RNA剪接（RNA splicing）：去除内含子（intron），连接外显子（exon）
+
+可变剪接（alternative splicing）使得一个基因可以产生多种mRNA，增加蛋白质组的多样性。人类基因组中约95%的多外显子基因存在可变剪接。
+
+2.4 翻译
+
+翻译（translation）是在核糖体（ribosome）上将mRNA的核苷酸序列转换为多肽链的氨基酸序列的过程。
+
+遗传密码（genetic code）的特点：
+- 三联体密码（triplet codon）：每3个核苷酸编码1个氨基酸
+- 简并性（degeneracy）：多数氨基酸有多个密码子（如亮氨酸Leu有6个密码子）
+- 通用性（universality）：几乎所有生物使用相同的遗传密码（线粒体有少数例外）
+- 起始密码子（start codon）：AUG（编码甲硫氨酸Met）
+- 终止密码子（stop codon）：UAA、UAG、UGA
+
+原核生物翻译起始：30S小亚基识别Shine-Dalgarno序列（SD序列），与mRNA结合后招募50S大亚基形成70S核糖体。
+
+真核生物翻译起始：43S前起始复合物（含40S小亚基和eIFs）通过5'帽结构扫描mRNA，找到第一个AUG后招募60S大亚基形成80S核糖体。
+
+2.5 基因表达调控层次
+
+基因表达可在多个层次受到调控：
+1. 染色质水平：组蛋白修饰（histone modification）和DNA甲基化（DNA methylation）
+2. 转录水平：转录因子（transcription factor）的调控
+3. 转录后水平：mRNA稳定性、可变剪接
+4. 翻译水平：翻译起始调控、miRNA介导的翻译抑制
+5. 翻译后水平：蛋白质修饰（磷酸化、泛素化等）和蛋白质降解
+
+操纵子（operon）模型是原核生物基因表达调控的经典机制。大肠杆菌的乳糖操纵子（lac operon）由结构基因（lacZ、lacY、lacA）、操纵基因（operator, O）和启动子（P）组成。在没有乳糖时，阻遏蛋白（repressor）结合O区阻止转录；乳糖存在时，别构乳糖（allolactose）与阻遏蛋白结合使其失活，转录得以进行。

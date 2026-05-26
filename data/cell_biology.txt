@@ -1,0 +1,36 @@
+第一章 细胞的基本结构与功能
+
+细胞是生物体结构和功能的基本单位。根据细胞核的有无，可将细胞分为原核细胞（prokaryotic cell）和真核细胞（eukaryotic cell）两大类。
+
+1.1 细胞膜的结构
+
+细胞膜（cell membrane）又称质膜（plasma membrane），主要由磷脂双分子层（phospholipid bilayer）构成。膜蛋白根据其与脂双层的结合方式可分为：整合蛋白（integral protein）、外周蛋白（peripheral protein）和脂锚定蛋白（lipid-anchored protein）。
+
+流动镶嵌模型（fluid mosaic model）由Singer和Nicolson于1972年提出，该模型认为：磷脂双分子层构成膜的基本骨架，蛋白质分子以不同方式镶嵌其中，膜具有流动性。
+
+1.2 细胞器
+
+线粒体（mitochondria）是细胞的"动力工厂"，通过氧化磷酸化（oxidative phosphorylation）产生ATP。线粒体具有双层膜结构，内膜向内折叠形成嵴（cristae），基质中含有DNA、核糖体和参与三羧酸循环（TCA cycle / Krebs cycle）的酶系。
+
+叶绿体（chloroplast）是光合作用的场所，存在于植物细胞和藻类中。光合作用分为光反应（light reaction）和暗反应（dark reaction / Calvin cycle）。光反应在类囊体膜（thylamembrane）上进行，水分子在此被光解，释放O₂并产生ATP和NADPH。
+
+内质网（endoplasmic reticulum, ER）分为粗面内质网（rough ER, rER）和滑面内质网（smooth ER, sER）。rER表面附着核糖体，参与分泌蛋白的合成与加工；sER参与脂质合成和解毒功能。
+
+高尔基体（Golgi apparatus）主要功能是对来自内质网的蛋白质进行加工、分类和包装。在植物细胞中，高尔基体还参与细胞壁的形成。
+
+1.3 细胞骨架
+
+细胞骨架（cytoskeleton）由三种蛋白纤维组成：
+- 微管（microtubule）：由α-微管蛋白和β-微管蛋白组成的中空管状结构，直径约25nm
+- 微丝（microfilament）：由肌动蛋白（actin）组成，直径约7nm
+- 中间纤维（intermediate filament）：直径约10nm，起机械支撑作用
+
+1.4 细胞信号转导
+
+细胞信号转导（signal transduction）是指细胞将外部信号转化为内部反应的过程。常见的信号通路包括：
+
+G蛋白偶联受体（G protein-coupled receptor, GPCR）信号通路：配体与GPCR结合后，激活异三聚体G蛋白，进而激活下游效应器如腺苷酸环化酶（adenylyl cyclase, AC），产生第二信使cAMP。
+
+受体酪氨酸激酶（receptor tyrosine kinase, RTK）信号通路：配体结合导致受体二聚化和自磷酸化，激活Ras-MAPK级联反应，调控细胞增殖和分化。
+
+第二信使（second messenger）包括cAMP、cGMP、IP₃、DAG和Ca²⁺等小分子，它们在信号放大中起关键作用。
