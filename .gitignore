@@ -12,5 +12,11 @@ wheels/
 # Vector database
 chroma_db/
 
+# Models (large files, not for git)
+models/
+
 # HuggingFace cache
 .cache/
+
+# Environment variables
+.env
