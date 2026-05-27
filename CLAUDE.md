@@ -43,7 +43,7 @@ data/                # 用户上传的文档
 ## LLM配置
 
 - API: `https://token-plan-cn.xiaomimimo.com/v1`（小米MiMo，OpenAI兼容协议）
-- 模型: `mimo-v2-flash`
+- 模型: `mimo-v2.5h`
 - 认证: `api-key` header（非标准 `Authorization: Bearer`），用 `default_headers` 适配
 - 环境变量: `MIMO_API_KEY`（必须设置，不写入代码）
 
