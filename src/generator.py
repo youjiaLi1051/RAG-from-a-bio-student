@@ -1,16 +1,15 @@
 """
 LLM 生成模块
-接收检索结果 + 用户问题，调用 MiMo API 生成回答
+接收检索结果 + 用户问题，调用 LLM API 生成回答
+配置从 data/llm_config.json 读取
 """
 
 import os
+import json
 
-from dotenv import load_dotenv
 from openai import OpenAI
 
-from src.config import MIMO_API_BASE, MIMO_MODEL
-
-load_dotenv()
+from src.config import LLM_CONFIG_FILE
 
 SYSTEM_PROMPT = """你是一个专业的生物学考研辅导助手。请根据提供的参考资料回答学生的问题。
 
@@ -43,12 +42,28 @@ RD细胞是该实验使用的主要细胞系。
 """
 
 
+def _load_llm_config() -> dict:
+    """从文件读取 LLM 配置"""
+    if LLM_CONFIG_FILE.exists():
+        return json.loads(LLM_CONFIG_FILE.read_text(encoding="utf-8"))
+    return {}
+
+
 class Generator:
-    def __init__(self, model: str = MIMO_MODEL, api_url: str = MIMO_API_BASE, api_key: str | None = None):
-        if api_key is None:
-            api_key = os.environ.get("MIMO_API_KEY")
+    def __init__(self, api_url: str | None = None, api_key: str | None = None, model: str | None = None):
+        # 优先使用参数，其次读配置文件
+        config = _load_llm_config()
+
+        api_url = api_url or config.get("api_url")
+        api_key = api_key or config.get("api_key")
+        model = model or config.get("model")
+
         if not api_key:
-            raise ValueError("请设置环境变量 MIMO_API_KEY 或提供 api_key 参数")
+            raise ValueError("未配置 LLM，请先在设置页面配置 API Key")
+        if not api_url:
+            raise ValueError("未配置 LLM，请先在设置页面配置 API URL")
+        if not model:
+            raise ValueError("未配置 LLM，请先在设置页面配置模型名称")
 
         # miniconda 设置的 SSL_CERT_FILE 指向不存在的文件，会导致 httpx 报错
         if "SSL_CERT_FILE" in os.environ:

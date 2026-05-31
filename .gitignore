@@ -21,6 +21,9 @@ models/
 # Environment variables
 .env
 
+# LLM config (contains API keys)
+data/llm_config.json
+
 # Frontend
 frontend/node_modules/
 frontend/dist/

@@ -1,4 +1,4 @@
-"""共享配置：路径常量 + API 设置"""
+"""共享配置：路径常量"""
 
 from pathlib import Path
 
@@ -16,6 +16,5 @@ CHUNK_SIZE = 512
 CHUNK_OVERLAP = 64
 ALLOWED_EXTENSIONS = {".txt", ".md", ".docx", ".pdf"}
 
-# ── MiMo LLM ─────────────────────────────────────────
-MIMO_API_BASE = "https://token-plan-cn.xiaomimimo.com/v1"
-MIMO_MODEL = "mimo-v2.5"
+# ── LLM 配置文件 ─────────────────────────────────────
+LLM_CONFIG_FILE = DATA_DIR / "llm_config.json"

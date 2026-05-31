@@ -15,7 +15,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from src.config import DATA_DIR, CHROMA_DIR, PROJECT_ROOT, ALLOWED_EXTENSIONS
+from src.config import DATA_DIR, CHROMA_DIR, PROJECT_ROOT, ALLOWED_EXTENSIONS, LLM_CONFIG_FILE
 
 
 # ── FastAPI 实例 ──────────────────────────────────────
@@ -42,7 +42,6 @@ class AskRequest(BaseModel):
     question: str
     top_k: int = 20
     top_n: int = 3
-    llm_config: LLMConfig | None = None
 
 
 # ── 全局状态 ──────────────────────────────────────────
@@ -135,23 +134,11 @@ def ask(req: AskRequest):
     except Exception as e:
         raise HTTPException(500, f"检索模型未就绪: {e}")
 
-    # 如果前端传了 llm_config，用自定义配置创建 Generator
-    if req.llm_config and (req.llm_config.api_url or req.llm_config.api_key or req.llm_config.model):
-        try:
-            from src.config import MIMO_API_BASE, MIMO_MODEL
-            from src.generator import Generator
-            generator = Generator(
-                api_url=req.llm_config.api_url or MIMO_API_BASE,
-                api_key=req.llm_config.api_key,
-                model=req.llm_config.model or MIMO_MODEL,
-            )
-        except Exception as e:
-            raise HTTPException(500, f"LLM 初始化失败: {e}")
-    else:
-        try:
-            generator = get_generator()
-        except Exception as e:
-            raise HTTPException(500, f"模型未就绪: {e}")
+    # 使用服务端存储的配置
+    try:
+        generator = get_generator()
+    except Exception as e:
+        raise HTTPException(500, f"模型未就绪: {e}")
 
     t1 = time.time()
 
@@ -196,6 +183,56 @@ def clear_history():
     """清空聊天记录"""
     _save_history([])
     return {"message": "聊天记录已清空"}
+
+
+# ── LLM 配置管理 ──────────────────────────────────────
+
+def _load_llm_config() -> dict:
+    """从文件读取 LLM 配置"""
+    if LLM_CONFIG_FILE.exists():
+        import json
+        return json.loads(LLM_CONFIG_FILE.read_text(encoding="utf-8"))
+    return {}
+
+
+def _save_llm_config(config: dict):
+    """保存 LLM 配置到文件"""
+    import json
+    LLM_CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
+    LLM_CONFIG_FILE.write_text(
+        json.dumps(config, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+
+@app.get("/api/v1/settings/llm")
+def get_llm_settings():
+    """获取 LLM 配置（不返回 api_key）"""
+    config = _load_llm_config()
+    return {
+        "api_url": config.get("api_url", ""),
+        "model": config.get("model", ""),
+        "configured": bool(config.get("api_key")),
+    }
+
+
+@app.post("/api/v1/settings/llm")
+def save_llm_settings(req: LLMConfig):
+    """保存 LLM 配置"""
+    config = _load_llm_config()
+    if req.api_url is not None:
+        config["api_url"] = req.api_url
+    if req.api_key is not None:
+        config["api_key"] = req.api_key
+    if req.model is not None:
+        config["model"] = req.model
+    _save_llm_config(config)
+
+    # 重置 generator 使其使用新配置
+    global _generator
+    _generator = None
+
+    return {"message": "设置已保存", "configured": bool(config.get("api_key"))}
 
 
 # ── 文档管理接口 ──────────────────────────────────────
