@@ -8,11 +8,9 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 
+from src.config import MIMO_API_BASE, MIMO_MODEL
+
 load_dotenv()
-
-
-MIMO_BASE_URL = "https://token-plan-cn.xiaomimimo.com/v1"
-DEFAULT_MODEL = "mimo-v2.5"
 
 SYSTEM_PROMPT = (
     "你是一个生物学考研助手。根据提供的参考资料回答问题。\n"
@@ -25,14 +23,14 @@ SYSTEM_PROMPT = (
 
 
 class Generator:
-    def __init__(self, model: str = DEFAULT_MODEL):
+    def __init__(self, model: str = MIMO_MODEL):
         api_key = os.environ.get("MIMO_API_KEY")
         if not api_key:
             raise ValueError("请设置环境变量 MIMO_API_KEY")
 
         self._client = OpenAI(
             api_key="not-used",
-            base_url=MIMO_BASE_URL,
+            base_url=MIMO_API_BASE,
             default_headers={"api-key": api_key},
         )
         self._model = model

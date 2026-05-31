@@ -6,10 +6,12 @@
 
 from pathlib import Path
 
+from src.config import DATA_DIR
+
 SUPPORTED_EXTENSIONS = {".txt", ".md", ".docx", ".pdf"}
 
 
-def load_documents(data_dir: Path) -> list[dict]:
+def load_documents(data_dir: Path = DATA_DIR) -> list[dict]:
     """扫描 data_dir，加载所有支持格式的文档"""
     documents = []
     for file_path in sorted(data_dir.iterdir()):

@@ -3,24 +3,16 @@
 文档加载 → 切块 → bge-m3 编码 → 存入 ChromaDB
 """
 
-import json
 import re
-from pathlib import Path
 
 import chromadb
 from FlagEmbedding import BGEM3FlagModel
 
+from src.config import (
+    CHROMA_DIR, COLLECTION_NAME, DATA_DIR, EMBED_MODEL_PATH,
+    CHUNK_SIZE, CHUNK_OVERLAP,
+)
 from src.loader import load_documents
-
-
-PROJECT_ROOT = Path(__file__).parent.parent
-DATA_DIR = PROJECT_ROOT / "data"
-DB_DIR = PROJECT_ROOT / "chroma_db"
-MODELS_DIR = PROJECT_ROOT / "models"
-EMBED_MODEL_PATH = MODELS_DIR / "bge-m3"
-COLLECTION_NAME = "biology_kb"
-CHUNK_SIZE = 512
-CHUNK_OVERLAP = 64
 
 
 def chunk_text(text: str, source: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP) -> list[dict]:
@@ -78,17 +70,15 @@ def build_index(chunks: list[dict]):
         batch_size=8,
         max_length=512,
         return_dense=True,
-        return_sparse=True,
         return_colbert_vecs=False,
     )
 
     dense_vecs = output["dense_vecs"]
-    sparse_weights = output["lexical_weights"]
 
     print(f"编码完成，dense 向量维度: {dense_vecs.shape[1]}")
 
     print("存入 ChromaDB...")
-    client = chromadb.PersistentClient(path=str(DB_DIR))
+    client = chromadb.PersistentClient(path=str(CHROMA_DIR))
 
     try:
         client.delete_collection(COLLECTION_NAME)
@@ -111,16 +101,6 @@ def build_index(chunks: list[dict]):
     )
 
     print(f"已存储 {len(chunks)} 个 chunk 到集合 '{COLLECTION_NAME}'")
-
-    sparse_path = DB_DIR / "sparse_weights.json"
-    sparse_data = {}
-    for i, chunk in enumerate(chunks):
-        sparse_data[chunk["chunk_id"]] = {
-            "weights": {str(k): float(v) for k, v in sparse_weights[i].items()},
-            "source": chunk["source"],
-        }
-    sparse_path.write_text(json.dumps(sparse_data, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"sparse 权重已保存到 {sparse_path}")
 
     return collection
 

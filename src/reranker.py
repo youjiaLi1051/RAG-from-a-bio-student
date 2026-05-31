@@ -3,17 +3,13 @@ Reranker 模块
 用 bge-reranker-v2-m3 对候选文档重新打分，提升检索精度
 """
 
-from pathlib import Path
-
 from FlagEmbedding import FlagReranker
 
-
-PROJECT_ROOT = Path(__file__).parent.parent
-RERANK_MODEL_PATH = PROJECT_ROOT / "models" / "bge-reranker-v2-m3"
+from src.config import RERANKER_MODEL_PATH
 
 
 class Reranker:
-    def __init__(self, model_path: str = str(RERANK_MODEL_PATH), use_fp16: bool = True):
+    def __init__(self, model_path: str = str(RERANKER_MODEL_PATH), use_fp16: bool = True):
         self._model_path = model_path
         self._use_fp16 = use_fp16
         self._model = None

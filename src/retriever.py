@@ -3,27 +3,19 @@
 embedding 粗筛 → reranker 精排 → 返回结果
 """
 
-from pathlib import Path
-
 import chromadb
 from FlagEmbedding import BGEM3FlagModel
 
+from src.config import CHROMA_DIR, COLLECTION_NAME, EMBED_MODEL_PATH, RERANKER_MODEL_PATH
 from src.reranker import Reranker
-
-
-PROJECT_ROOT = Path(__file__).parent.parent
-DB_DIR = PROJECT_ROOT / "chroma_db"
-MODELS_DIR = PROJECT_ROOT / "models"
-EMBED_MODEL_PATH = MODELS_DIR / "bge-m3"
-COLLECTION_NAME = "biology_kb"
 
 
 class Retriever:
     def __init__(
         self,
         embed_model_path: str = str(EMBED_MODEL_PATH),
-        reranker_model_path: str = str(MODELS_DIR / "bge-reranker-v2-m3"),
-        db_path: str = str(DB_DIR),
+        reranker_model_path: str = str(RERANKER_MODEL_PATH),
+        db_path: str = str(CHROMA_DIR),
         collection_name: str = COLLECTION_NAME,
     ):
         print("加载 embedding 模型...")
