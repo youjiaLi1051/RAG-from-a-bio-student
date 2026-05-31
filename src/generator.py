@@ -44,10 +44,11 @@ RD细胞是该实验使用的主要细胞系。
 
 
 class Generator:
-    def __init__(self, model: str = MIMO_MODEL):
-        api_key = os.environ.get("MIMO_API_KEY")
+    def __init__(self, model: str = MIMO_MODEL, api_url: str = MIMO_API_BASE, api_key: str | None = None):
+        if api_key is None:
+            api_key = os.environ.get("MIMO_API_KEY")
         if not api_key:
-            raise ValueError("请设置环境变量 MIMO_API_KEY")
+            raise ValueError("请设置环境变量 MIMO_API_KEY 或提供 api_key 参数")
 
         # miniconda 设置的 SSL_CERT_FILE 指向不存在的文件，会导致 httpx 报错
         if "SSL_CERT_FILE" in os.environ:
@@ -57,7 +58,7 @@ class Generator:
 
         self._client = OpenAI(
             api_key="not-used",
-            base_url=MIMO_API_BASE,
+            base_url=api_url,
             default_headers={"api-key": api_key},
         )
         self._model = model

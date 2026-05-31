@@ -32,10 +32,17 @@ app.add_middleware(
 
 # ── 请求模型 ──────────────────────────────────────────
 
+class LLMConfig(BaseModel):
+    api_url: str | None = None
+    api_key: str | None = None
+    model: str | None = None
+
+
 class AskRequest(BaseModel):
     question: str
     top_k: int = 20
     top_n: int = 3
+    llm_config: LLMConfig | None = None
 
 
 # ── 全局状态 ──────────────────────────────────────────
@@ -60,7 +67,9 @@ def load_models():
     try:
         from src.retriever import Retriever
         _retriever = Retriever()
-        print("[OK] Retriever loaded")
+        # 预加载 reranker（否则首次查询才加载，很慢）
+        _retriever._reranker._ensure_loaded()
+        print("[OK] Retriever + Reranker loaded")
     except Exception as e:
         print(f"[WARN] Retriever failed: {e}")
 
@@ -115,18 +124,43 @@ def _save_history(history: list[dict]):
 @app.post("/api/v1/qa/ask")
 def ask(req: AskRequest):
     """提问 → 检索 → LLM 生成回答 → 保存记录"""
+    import time
+    t0 = time.time()
+
     if not CHROMA_DIR.exists():
         raise HTTPException(400, "索引不存在，请先上传文档并构建索引")
 
     try:
         retriever = get_retriever()
-        generator = get_generator()
     except Exception as e:
-        raise HTTPException(500, f"模型未就绪: {e}")
+        raise HTTPException(500, f"检索模型未就绪: {e}")
+
+    # 如果前端传了 llm_config，用自定义配置创建 Generator
+    if req.llm_config and (req.llm_config.api_url or req.llm_config.api_key or req.llm_config.model):
+        try:
+            from src.config import MIMO_API_BASE, MIMO_MODEL
+            from src.generator import Generator
+            generator = Generator(
+                api_url=req.llm_config.api_url or MIMO_API_BASE,
+                api_key=req.llm_config.api_key,
+                model=req.llm_config.model or MIMO_MODEL,
+            )
+        except Exception as e:
+            raise HTTPException(500, f"LLM 初始化失败: {e}")
+    else:
+        try:
+            generator = get_generator()
+        except Exception as e:
+            raise HTTPException(500, f"模型未就绪: {e}")
+
+    t1 = time.time()
 
     try:
         results = retriever.retrieve(req.question, top_k=req.top_k, top_n=req.top_n)
+        t2 = time.time()
         answer = generator.generate(req.question, results)
+        t3 = time.time()
+        print(f"[Timing] retrieve: {t2-t1:.1f}s | generate: {t3-t2:.1f}s | total: {t3-t0:.1f}s")
     except Exception as e:
         raise HTTPException(500, f"问答失败: {e}")
 

@@ -1,65 +1,104 @@
 <template>
-  <div class="max-w-3xl mx-auto px-4 py-8">
-    <!-- 操作栏 -->
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-lg font-semibold">文档管理</h2>
-      <div class="flex gap-2">
-        <label class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer">
-          上传文档
-          <input type="file" accept=".txt,.md,.docx,.pdf" @change="handleUpload" class="hidden" />
-        </label>
-        <button
-          @click="handleBuildIndex"
-          :disabled="indexing"
-          class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300"
-        >
-          {{ indexing ? '构建中...' : '重建索引' }}
-        </button>
-      </div>
-    </div>
-
-    <!-- 状态提示 -->
-    <div v-if="message" class="mb-4 p-3 rounded-lg text-sm" :class="messageType === 'error' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'">
-      {{ message }}
-    </div>
-
-    <!-- 文档列表 -->
-    <div v-if="documents.length === 0" class="text-center text-gray-400 py-12">
-      暂无文档，请上传
-    </div>
-
-    <div v-else class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-      <div v-for="doc in documents" :key="doc.name" class="flex items-center justify-between px-4 py-3">
-        <div>
-          <p class="text-sm font-medium">{{ doc.name }}</p>
-          <p class="text-xs text-gray-400">{{ formatSize(doc.size) }}</p>
+  <div class="max-w-5xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+      <!-- 左侧：文档管理（3列） -->
+      <div class="md:col-span-3">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-semibold">文档管理</h2>
+          <div class="flex gap-2">
+            <label class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors cursor-pointer">
+              上传文档
+              <input type="file" accept=".txt,.md,.docx,.pdf" @change="handleUpload" class="hidden" />
+            </label>
+            <button
+              @click="handleBuildIndex"
+              :disabled="indexing"
+              class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors disabled:bg-gray-300"
+            >
+              {{ indexing ? '构建中...' : '重建索引' }}
+            </button>
+          </div>
         </div>
-        <button
-          @click="handleDelete(doc.name)"
-          class="text-red-500 hover:text-red-700 text-sm"
-        >
-          删除
-        </button>
-      </div>
-    </div>
 
-    <!-- 索引状态 -->
-    <div class="mt-6 p-4 bg-gray-50 rounded-xl text-sm text-gray-600">
-      <p>索引状态：{{ indexExists ? '✅ 已构建' : '❌ 未构建' }}</p>
-      <p v-if="indexing" class="text-blue-600 mt-1">⏳ 正在构建索引...</p>
+        <!-- 状态提示 -->
+        <div v-if="message" class="mb-4 p-3 rounded-lg text-sm" :class="messageType === 'error' ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'">
+          {{ message }}
+        </div>
+
+        <!-- 文档列表 -->
+        <div v-if="documents.length === 0" class="text-center text-gray-400 py-12">
+          暂无文档，请上传
+        </div>
+
+        <div v-else class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+          <div v-for="doc in documents" :key="doc.name" class="flex items-center justify-between px-4 py-3">
+            <div>
+              <p class="text-sm font-medium">{{ doc.name }}</p>
+              <p class="text-xs text-gray-400">{{ formatSize(doc.size) }}</p>
+            </div>
+            <button
+              @click="handleDelete(doc.name)"
+              class="text-red-500 hover:text-red-700 text-sm"
+            >
+              删除
+            </button>
+          </div>
+        </div>
+
+        <!-- 索引状态 -->
+        <div class="mt-4 p-4 bg-gray-50 rounded-xl text-sm text-gray-600">
+          <p>索引状态：{{ indexExists ? '✅ 已构建' : '❌ 未构建' }}</p>
+          <p v-if="indexing" class="text-blue-600 mt-1">⏳ 正在构建索引...</p>
+        </div>
+      </div>
+
+      <!-- 右侧：统计信息（2列） -->
+      <div class="md:col-span-2">
+        <h2 class="text-lg font-semibold mb-6">统计信息</h2>
+
+        <div class="space-y-4">
+          <div class="bg-white rounded-xl border border-gray-200 p-5">
+            <p class="text-sm text-gray-500">文档数量</p>
+            <p class="text-3xl font-bold text-blue-600 mt-1">{{ stats.document_count }}</p>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 p-5">
+            <p class="text-sm text-gray-500">Chunk 数量</p>
+            <p class="text-3xl font-bold text-green-600 mt-1">{{ stats.chunk_count }}</p>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 p-5">
+            <p class="text-sm text-gray-500">索引状态</p>
+            <p class="text-lg font-medium mt-1">
+              {{ stats.index_exists ? '✅ 已构建' : '❌ 未构建' }}
+            </p>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 p-5">
+            <p class="text-sm text-gray-500">模型状态</p>
+            <p class="text-lg font-medium mt-1">
+              {{ stats.models_ready ? '✅ 已就绪' : '⏳ 加载中' }}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { listDocuments, uploadDocument, deleteDocument, buildIndex, indexStatus } from '../api.js'
+import { listDocuments, uploadDocument, deleteDocument, buildIndex, indexStatus, getStats } from '../api.js'
 
 const documents = ref([])
 const message = ref('')
 const messageType = ref('success')
 const indexing = ref(false)
 const indexExists = ref(false)
+
+const stats = ref({
+  document_count: 0,
+  chunk_count: 0,
+  index_exists: false,
+  models_ready: false,
+})
 
 async function loadDocuments() {
   try {
@@ -80,6 +119,14 @@ async function loadIndexStatus() {
   }
 }
 
+async function loadStats() {
+  try {
+    stats.value = await getStats()
+  } catch (e) {
+    // ignore
+  }
+}
+
 async function handleUpload(e) {
   const file = e.target.files[0]
   if (!file) return
@@ -88,6 +135,7 @@ async function handleUpload(e) {
     await uploadDocument(file)
     showMessage(`已上传: ${file.name}`)
     await loadDocuments()
+    await loadStats()
   } catch (e) {
     showMessage(e.message, 'error')
   }
@@ -102,6 +150,7 @@ async function handleDelete(filename) {
     await deleteDocument(filename)
     showMessage(`已删除: ${filename}`)
     await loadDocuments()
+    await loadStats()
   } catch (e) {
     showMessage(e.message, 'error')
   }
@@ -116,6 +165,7 @@ async function handleBuildIndex() {
     // 轮询状态
     const check = setInterval(async () => {
       await loadIndexStatus()
+      await loadStats()
       if (!indexing.value) {
         clearInterval(check)
         showMessage('索引构建完成！')
@@ -141,5 +191,6 @@ function formatSize(bytes) {
 onMounted(() => {
   loadDocuments()
   loadIndexStatus()
+  loadStats()
 })
 </script>

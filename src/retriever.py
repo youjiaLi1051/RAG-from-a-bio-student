@@ -32,20 +32,28 @@ class Retriever:
         1. embedding 搜索 top_k 候选
         2. reranker 精排返回 top_n
         """
+        import time
+
         # 阶段 1：向量检索
+        t0 = time.time()
         query_vec = self._embed_model.encode(
             [query], return_dense=True, return_colbert_vecs=False
         )["dense_vecs"]
+        t1 = time.time()
         results = self._collection.query(
             query_embeddings=query_vec.tolist(),
             n_results=top_k,
         )
+        t2 = time.time()
         docs = results["documents"][0]
         metas = results["metadatas"][0]
         dists = results["distances"][0]
 
         # 阶段 2：reranker 精排
         ranked = self._reranker.rerank(query, docs, top_n=top_n)
+        t3 = time.time()
+
+        print(f"  [retrieve] encode: {t1-t0:.1f}s | chromadb: {t2-t1:.1f}s | rerank: {t3-t2:.1f}s")
 
         output = []
         for orig_idx, score in ranked:

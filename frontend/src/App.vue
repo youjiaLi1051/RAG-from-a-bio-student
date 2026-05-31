@@ -30,6 +30,6 @@ const navItems = [
   { path: '/chat', label: '问答' },
   { path: '/files', label: '文档' },
   { path: '/history', label: '记录' },
-  { path: '/stats', label: '统计' },
+  { path: '/settings', label: '设置' },
 ]
 </script>

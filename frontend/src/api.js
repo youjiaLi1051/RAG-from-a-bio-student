@@ -17,12 +17,38 @@ async function request(path, options = {}) {
   return res.json()
 }
 
+// ── LLM 配置 ─────────────────────────────────────────
+
+const LLM_CONFIG_KEY = 'biograph_llm_config'
+
+function getLlmConfig() {
+  try {
+    const raw = localStorage.getItem(LLM_CONFIG_KEY)
+    if (raw) {
+      const cfg = JSON.parse(raw)
+      const llm_config = {}
+      if (cfg.api_url) llm_config.api_url = cfg.api_url
+      if (cfg.api_key) llm_config.api_key = cfg.api_key
+      if (cfg.model) llm_config.model = cfg.model
+      return Object.keys(llm_config).length > 0 ? llm_config : undefined
+    }
+  } catch {
+    // ignore
+  }
+  return undefined
+}
+
 // ── 问答 ──────────────────────────────────────────
 
 export function ask(question, top_k = 20, top_n = 3) {
+  const body = { question, top_k, top_n }
+  const llm_config = getLlmConfig()
+  if (llm_config) {
+    body.llm_config = llm_config
+  }
   return request('/qa/ask', {
     method: 'POST',
-    body: JSON.stringify({ question, top_k, top_n }),
+    body: JSON.stringify(body),
   })
 }
 
