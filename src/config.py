@@ -14,6 +14,7 @@ RERANKER_MODEL_PATH = MODELS_DIR / "bge-reranker-v2-m3"
 COLLECTION_NAME = "biograph"
 CHUNK_SIZE = 512
 CHUNK_OVERLAP = 64
+ALLOWED_EXTENSIONS = {".txt", ".md", ".docx", ".pdf"}
 
 # ── MiMo LLM ─────────────────────────────────────────
 MIMO_API_BASE = "https://token-plan-cn.xiaomimimo.com/v1"

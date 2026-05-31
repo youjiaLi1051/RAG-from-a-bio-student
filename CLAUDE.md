@@ -2,24 +2,31 @@
 
 ## 项目概述
 
-AI考研训练系统（生物学方向），完整RAG管线：文档加载→索引构建→两阶段检索→LLM生成回答。
+AI考研训练系统（生物学方向），完整RAG管线：文档加载→索引构建→两阶段检索→LLM生成回答。Vue 3 + Tailwind 前端，FastAPI 后端。
 
 ## 项目结构
 
 ```
 src/
-├── loader.py       # 文档解析：.txt/.md/.docx/.pdf
-├── indexer.py       # 建索引：加载文档→切块→bge-m3 embedding→存ChromaDB
-├── retriever.py     # 查询管线：embedding搜索→reranker精排→返回结果
-├── reranker.py      # reranker模型封装（延迟加载）
-├── generator.py     # LLM生成：调用MiMo API基于检索结果生成回答
+├── config.py        # 共享配置：路径常量、API设置
+├── loader.py        # 文档解析：.txt/.md/.docx/.pdf
+├── indexer.py        # 建索引：加载文档→切块→bge-m3 embedding→存ChromaDB
+├── retriever.py      # 查询管线：embedding搜索→reranker精排→返回结果
+├── reranker.py       # reranker模型封装（延迟加载）
+├── generator.py      # LLM生成：调用MiMo API基于检索结果生成回答
+├── api.py            # FastAPI REST API端点
+
+frontend/
+├── src/views/        # Vue页面（ChatView, FilesView, StatsView）
+├── src/api.js        # 前端API客户端
+├── src/App.vue       # 主布局+导航
 
 models/
-├── bge-m3/          # embedding模型（~4.3GB, fp16 ~2.2GB显存）
-├── bge-reranker-v2-m3/  # reranker模型（~2.2GB, fp16 ~1.2GB显存）
+├── bge-m3/           # embedding模型（~2.2GB显存）
+├── bge-reranker-v2-m3/  # reranker模型（~1.2GB显存）
 
-chroma_db/           # ChromaDB持久化存储（向量数据库）
-data/                # 用户上传的文档
+chroma_db/            # ChromaDB持久化存储（向量数据库）
+data/                 # 用户上传的文档
 ```
 
 ## 检索架构
@@ -53,11 +60,17 @@ data/                # 用户上传的文档
 # 建索引（文档变更后执行）
 python -m src.indexer
 
-# 完整RAG问答
+# 启动Web服务（端口8000，同时serve API和前端）
+python run_server.py
+
+# 开发模式（前端热重载）
+cd frontend && npm run dev   # 端口5173，自动代理API到8000
+
+# CLI问答（不启动Web服务）
 python main.py
 
-# 测试检索
-python -c "from src.retriever import Retriever; r = Retriever(); print(r.retrieve('DNA复制需要哪些酶？'))"
+# 构建前端（FastAPI serve静态文件）
+cd frontend && npm run build
 ```
 
 ## 硬件约束
