@@ -24,6 +24,14 @@ models/
 # LLM config (contains API keys)
 data/llm_config.json
 
+# Chat history
+data/chat_history.json
+
+# User documents (keep only example)
+data/*.txt
+data/*.md
+!data/example.md
+
 # Frontend
 frontend/node_modules/
 frontend/dist/
