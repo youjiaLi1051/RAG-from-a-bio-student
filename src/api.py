@@ -76,14 +76,18 @@ def load_models():
 
 
 def get_retriever():
+    global _retriever
     if _retriever is None:
-        raise RuntimeError("Retriever 未加载")
+        from src.retriever import Retriever
+        _retriever = Retriever()
     return _retriever
 
 
 def get_generator():
+    global _generator
     if _generator is None:
-        raise RuntimeError("Generator 未加载")
+        from src.generator import Generator
+        _generator = Generator()
     return _generator
 
 
@@ -208,14 +212,14 @@ def delete_document(filename: str):
 
 def _trigger_rebuild():
     """后台重建索引"""
-    global _indexing
+    global _indexing, _retriever
     if _indexing:
         return
 
     _indexing = True
 
     def _run():
-        global _indexing
+        global _indexing, _retriever
         try:
             from src.loader import load_documents
             from src.indexer import chunk_text, build_index as _build_index
@@ -228,8 +232,12 @@ def _trigger_rebuild():
 
             if all_chunks:
                 _build_index(all_chunks)
+
+            # 索引重建后，重置 Retriever 以使用新集合
+            _retriever = None
+            print("Retriever reset, will reload on next query")
         except Exception as e:
-            print(f"索引重建失败: {e}")
+            print(f"Index rebuild failed: {e}")
         finally:
             _indexing = False
 
