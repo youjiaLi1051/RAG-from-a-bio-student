@@ -15,36 +15,37 @@
       暂无聊天记录
     </div>
 
-    <div v-else class="space-y-4">
+    <div v-else class="space-y-3">
       <div
         v-for="record in history"
         :key="record.id"
-        class="bg-white rounded-xl border border-gray-200 p-4"
+        class="bg-white rounded-xl border border-gray-200 p-4 cursor-pointer hover:border-gray-300 transition-colors"
+        @click="toggleExpand(record.id)"
       >
-        <!-- 问题 -->
-        <div class="flex items-start gap-3 mb-3">
-          <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-sm font-medium shrink-0">
-            Q
-          </div>
-          <div class="flex-1">
-            <p class="text-sm font-medium text-gray-900">{{ record.question }}</p>
-            <p class="text-xs text-gray-400 mt-1">{{ formatTime(record.timestamp) }}</p>
+        <!-- 问题 + 时间 -->
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-sm font-medium text-gray-900 flex-1 truncate">{{ record.question }}</p>
+          <span class="text-xs text-gray-400 ml-2 shrink-0">{{ formatTime(record.timestamp) }}</span>
+        </div>
+
+        <!-- 回答预览（折叠时） -->
+        <div v-if="!expanded[record.id]" class="text-sm text-gray-500 line-clamp-2">
+          {{ record.answer }}
+        </div>
+
+        <!-- 完整回答（展开时） -->
+        <div v-else>
+          <div class="text-sm text-gray-700 prose prose-sm mt-2" v-html="formatAnswer(record.answer)"></div>
+          <div v-if="record.sources?.length" class="mt-2 pt-2 border-t border-gray-100">
+            <p class="text-xs text-gray-400">
+              来源：{{ record.sources.join(', ') }}
+            </p>
           </div>
         </div>
 
-        <!-- 回答 -->
-        <div class="flex items-start gap-3">
-          <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-sm font-medium shrink-0">
-            A
-          </div>
-          <div class="flex-1">
-            <div class="text-sm text-gray-700 prose prose-sm" v-html="formatAnswer(record.answer)"></div>
-            <div v-if="record.sources?.length" class="mt-2 pt-2 border-t border-gray-100">
-              <p class="text-xs text-gray-400">
-                来源：{{ record.sources.join(', ') }}
-              </p>
-            </div>
-          </div>
+        <!-- 展开/折叠提示 -->
+        <div class="text-xs text-gray-400 mt-2 text-center">
+          {{ expanded[record.id] ? '点击收起' : '点击展开' }}
         </div>
       </div>
     </div>
@@ -52,10 +53,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { marked } from 'marked'
 import { getHistory, clearHistory } from '../api.js'
 
+marked.setOptions({ breaks: true, gfm: true })
+
 const history = ref([])
+const expanded = reactive({})
+
+function toggleExpand(id) {
+  expanded[id] = !expanded[id]
+}
 
 async function loadHistory() {
   try {
@@ -89,8 +98,17 @@ function formatTime(iso) {
 
 function formatAnswer(text) {
   if (!text) return ''
-  return text.replace(/\n/g, '<br>')
+  return marked.parse(text)
 }
 
 onMounted(loadHistory)
 </script>
+
+<style scoped>
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>

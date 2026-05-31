@@ -64,7 +64,14 @@
 
 <script setup>
 import { ref } from 'vue'
+import { marked } from 'marked'
 import { ask } from '../api.js'
+
+// 配置 marked：关闭自动换行，保留原始 markdown
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+})
 
 const input = ref('')
 const messages = ref([])
@@ -87,19 +94,17 @@ async function handleAsk() {
   } catch (e) {
     messages.value.push({
       question: q,
-      answer: `⚠ 出错了：${e.message}`,
+      answer: `出错了：${e.message}`,
       sources: [],
     })
   } finally {
     loading.value = false
-    // 滚动到底部
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
   }
 }
 
 function formatAnswer(text) {
   if (!text) return ''
-  // 简单换行处理
-  return text.replace(/\n/g, '<br>')
+  return marked.parse(text)
 }
 </script>
