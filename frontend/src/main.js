@@ -5,6 +5,7 @@ import './style.css'
 
 import ChatView from './views/ChatView.vue'
 import FilesView from './views/FilesView.vue'
+import HistoryView from './views/HistoryView.vue'
 import StatsView from './views/StatsView.vue'
 
 const router = createRouter({
@@ -13,6 +14,7 @@ const router = createRouter({
     { path: '/', redirect: '/chat' },
     { path: '/chat', component: ChatView },
     { path: '/files', component: FilesView },
+    { path: '/history', component: HistoryView },
     { path: '/stats', component: StatsView },
   ],
 })

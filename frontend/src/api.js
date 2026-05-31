@@ -62,3 +62,13 @@ export function indexStatus() {
 export function getStats() {
   return request('/stats')
 }
+
+// ── 聊天记录 ──────────────────────────────────────
+
+export function getHistory(limit = 50) {
+  return request(`/qa/history?limit=${limit}`)
+}
+
+export function clearHistory() {
+  return request('/qa/history', { method: 'DELETE' })
+}
